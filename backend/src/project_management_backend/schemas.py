@@ -38,3 +38,9 @@ class UpdateCardRequest(BaseModel):
 class MoveCardRequest(BaseModel):
     columnId: str = Field(min_length=1)
     position: int = Field(ge=0)
+
+
+class AiConnectivityResponse(BaseModel):
+    model: str
+    prompt: str
+    answer: str

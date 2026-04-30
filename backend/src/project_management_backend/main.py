@@ -7,8 +7,11 @@ from fastapi import Body, FastAPI
 from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from openai import OpenAIError
+from project_management_backend import ai
 from project_management_backend import database
 from project_management_backend.schemas import (
+    AiConnectivityResponse,
     BoardResponse,
     CreateCardRequest,
     MoveCardRequest,
@@ -37,6 +40,22 @@ app.add_middleware(
 @app.get("/api/health")
 def health_check() -> dict[str, str]:
     return {"status": "ok", "service": "project-management"}
+
+
+@app.post("/api/ai/connectivity", response_model=AiConnectivityResponse)
+def check_ai_connectivity() -> dict[str, str]:
+    try:
+        answer = ai.check_connectivity()
+    except ai.MissingApiKeyError as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+    except OpenAIError as error:
+        raise HTTPException(status_code=502, detail="OpenAI request failed.") from error
+
+    return {
+        "model": ai.AI_MODEL,
+        "prompt": ai.CONNECTIVITY_PROMPT,
+        "answer": answer,
+    }
 
 
 @app.get("/api/board", response_model=BoardResponse)

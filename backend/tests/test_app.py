@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 import pytest
 
+from project_management_backend import ai
 import project_management_backend.main as backend_main
 from project_management_backend.main import app
 
@@ -20,6 +21,31 @@ def test_health_check_returns_json(client) -> None:
         "status": "ok",
         "service": "project-management",
     }
+
+
+def test_ai_connectivity_returns_mocked_openai_answer(client, monkeypatch) -> None:
+    monkeypatch.setattr(ai, "check_connectivity", lambda: "4")
+
+    response = client.post("/api/ai/connectivity")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "model": "gpt-4o-mini",
+        "prompt": "What is 2+2? Reply with only the number.",
+        "answer": "4",
+    }
+
+
+def test_ai_connectivity_reports_missing_api_key(client, monkeypatch) -> None:
+    def raise_missing_key() -> str:
+        raise ai.MissingApiKeyError("OPENAI_API_KEY is not configured.")
+
+    monkeypatch.setattr(ai, "check_connectivity", raise_missing_key)
+
+    response = client.post("/api/ai/connectivity")
+
+    assert response.status_code == 503
+    assert response.json()["detail"] == "OPENAI_API_KEY is not configured."
 
 
 def test_index_serves_frontend_entrypoint(client, tmp_path, monkeypatch) -> None:

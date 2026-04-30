@@ -4,5 +4,7 @@ services:
       context: .
     container_name: project-management-mvp
     image: project-management-mvp:latest
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
     ports:
       - "8000:8000"

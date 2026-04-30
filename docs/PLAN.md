@@ -194,17 +194,17 @@ Approval gate:
 Goal: prove the backend can call OpenAI using the configured local environment.
 
 Checklist:
-- [ ] Add OpenAI client configuration using `OPENAI_API_KEY` from the environment.
-- [ ] Use `gpt-4o-mini` as required.
-- [ ] Add a minimal backend endpoint or test helper for an AI connectivity check.
-- [ ] Send a simple "2+2" prompt and validate that a response is returned.
-- [ ] Avoid exposing the API key to the frontend.
-- [ ] Add clear error handling for missing or invalid API keys.
+- [x] Add OpenAI client configuration using `OPENAI_API_KEY` from the environment.
+- [x] Use `gpt-4o-mini` as required.
+- [x] Add a minimal backend endpoint or test helper for an AI connectivity check.
+- [x] Send a simple "2+2" prompt and validate that a response is returned.
+- [x] Avoid exposing the API key to the frontend.
+- [x] Add clear error handling for missing or invalid API keys.
 
 Tests:
-- [ ] Unit tests with the OpenAI call mocked.
-- [ ] Manual connectivity test using the real `OPENAI_API_KEY`.
-- [ ] Test or documented check for missing API key behavior.
+- [x] Unit tests with the OpenAI call mocked.
+- [x] Manual connectivity test using the real `OPENAI_API_KEY`.
+- [x] Test or documented check for missing API key behavior.
 
 Success criteria:
 - The backend can make a real OpenAI call locally.
