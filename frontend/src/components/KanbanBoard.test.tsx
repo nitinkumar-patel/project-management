@@ -125,4 +125,50 @@ describe("KanbanBoard", () => {
     expect(await within(column).findByText("Align roadmap themes")).toBeInTheDocument();
     expect(within(column).queryByText("New card")).not.toBeInTheDocument();
   });
+
+  it("refreshes the board after an AI update", async () => {
+    const aiBoard = {
+      ...initialData,
+      cards: {
+        ...initialData.cards,
+        "card-ai": {
+          id: "card-ai",
+          title: "AI generated card",
+          details: "Created by the assistant.",
+        },
+      },
+      columns: initialData.columns.map((column) =>
+        column.id === "col-backlog"
+          ? { ...column, cardIds: [...column.cardIds, "card-ai"] }
+          : column
+      ),
+    };
+    vi.mocked(fetch)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => initialData,
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          message: "I added a card.",
+          appliedUpdates: [
+            { type: "create_card", summary: "Created card 'AI generated card'." },
+          ],
+          board: aiBoard,
+        }),
+      } as Response);
+
+    render(<KanbanBoard />);
+    await screen.findAllByTestId(/column-/i);
+
+    await userEvent.type(
+      screen.getByLabelText(/message/i),
+      "Create an AI generated card"
+    );
+    await userEvent.click(screen.getByRole("button", { name: /send to ai/i }));
+
+    expect(await screen.findByText("AI generated card")).toBeInTheDocument();
+    expect(screen.getByText("Created card 'AI generated card'.")).toBeInTheDocument();
+  });
 });

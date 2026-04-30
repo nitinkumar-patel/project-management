@@ -248,21 +248,21 @@ Approval gate:
 Goal: add a polished sidebar chat widget that lets the user ask the AI to discuss and update the Kanban board.
 
 Checklist:
-- [ ] Add a sidebar chat UI that fits the existing color scheme.
-- [ ] Support sending user messages and displaying assistant responses.
-- [ ] Show loading and error states for AI requests.
-- [ ] Include conversation history in each backend AI call.
-- [ ] Refresh or update the Kanban UI automatically when the AI changes the board.
-- [ ] Make AI-applied changes clear to the user.
-- [ ] Keep the layout usable on desktop and smaller screens.
-- [ ] Preserve login and persistent board behavior.
+- [x] Add a sidebar chat UI that fits the existing color scheme.
+- [x] Support sending user messages and displaying assistant responses.
+- [x] Show loading and error states for AI requests.
+- [x] Include conversation history in each backend AI call.
+- [x] Refresh or update the Kanban UI automatically when the AI changes the board.
+- [x] Make AI-applied changes clear to the user.
+- [x] Keep the layout usable on desktop and smaller screens.
+- [x] Preserve login and persistent board behavior.
 
 Tests:
-- [ ] Component tests for chat input, message rendering, loading, and error states.
-- [ ] API-client tests for AI chat requests, if applicable.
-- [ ] End-to-end test for asking a question that does not change the board.
-- [ ] End-to-end test with mocked AI response that updates the board and refreshes the UI.
-- [ ] Full regression test for login, board persistence, and AI chat.
+- [x] Component tests for chat input, message rendering, loading, and error states.
+- [x] API-client tests for AI chat requests, if applicable.
+- [x] End-to-end test for asking a question that does not change the board.
+- [x] End-to-end test with mocked AI response that updates the board and refreshes the UI.
+- [x] Full regression test for login, board persistence, and AI chat.
 
 Success criteria:
 - The sidebar looks integrated with the app.

@@ -5,6 +5,7 @@ import {
   fetchBoard,
   moveCard,
   renameColumn,
+  sendAiChat,
   updateCard,
 } from "@/lib/api";
 
@@ -83,6 +84,32 @@ describe("api client", () => {
 
     await expect(fetchBoard()).rejects.toThrow(
       "API request failed with status 500."
+    );
+  });
+
+  it("sends AI chat requests with conversation history", async () => {
+    const aiResponse = {
+      message: "The board looks healthy.",
+      appliedUpdates: [],
+      board: initialData,
+    };
+    mockFetch({ ok: true, json: async () => aiResponse });
+
+    await expect(
+      sendAiChat("What should I do next?", [
+        { role: "assistant", content: "How can I help?" },
+      ])
+    ).resolves.toEqual(aiResponse);
+
+    expect(fetch).toHaveBeenCalledWith(
+      "/api/ai/chat",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({
+          question: "What should I do next?",
+          history: [{ role: "assistant", content: "How can I help?" }],
+        }),
+      })
     );
   });
 });

@@ -10,6 +10,7 @@ This directory contains the Kanban frontend. It is a Next.js App Router app usin
 - `src/components/ProjectApp.tsx` owns the local MVP sign-in gate and session state.
 - `src/components/LoginForm.tsx` renders the hardcoded local sign-in form.
 - `src/components/KanbanBoard.tsx` loads board state from the backend API and sends board mutations back to the API.
+- `src/components/AiChatSidebar.tsx` renders the AI chat sidebar and passes chat requests to the board.
 - `src/components/KanbanColumn.tsx` renders a droppable column, editable column title, cards, and the add-card form.
 - `src/components/KanbanCard.tsx` renders an individual draggable card and remove action.
 - `src/components/KanbanCardPreview.tsx` renders the drag overlay preview.
@@ -24,8 +25,8 @@ This directory contains the Kanban frontend. It is a Next.js App Router app usin
 - The board is loaded from the backend API and persisted in SQLite.
 - There are five fixed columns from the backend seed data, but their titles can be renamed in the UI.
 - Cards can be added, removed, reordered, and moved between columns.
+- The AI sidebar can answer board questions and apply backend-approved card updates.
 - The app requires the hardcoded MVP credentials `user` and `password` before showing the board.
-- AI chat is not currently wired into the frontend.
 
 ## Commands
 
@@ -44,6 +45,7 @@ Run commands from this `frontend/` directory.
 - Add or update Playwright tests for user-visible flows in `tests/`.
 - Keep existing board tests passing when changing Kanban behavior.
 - Mock API calls in focused unit/component tests and use Playwright for the real frontend/backend flow.
+- Mock AI responses in e2e tests when verifying deterministic UI refresh behavior.
 
 ## Conventions
 

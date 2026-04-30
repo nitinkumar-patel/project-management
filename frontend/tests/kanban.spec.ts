@@ -91,3 +91,55 @@ test("persists a column rename after reload", async ({ page }) => {
   await page.reload();
   await expect(firstColumn.getByLabel("Column title")).toHaveValue("Ideas");
 });
+
+test("asks the AI a question without changing the board", async ({ page }) => {
+  await signIn(page);
+  await page.route("**/api/ai/chat", async (route) => {
+    const boardResponse = await page.request.get("http://127.0.0.1:8010/api/board");
+    const board = await boardResponse.json();
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        message: "The board has five active columns.",
+        appliedUpdates: [],
+        board,
+      }),
+    });
+  });
+
+  await page.getByLabel("Message").fill("Summarize the board");
+  await page.getByRole("button", { name: /send to ai/i }).click();
+
+  await expect(page.getByText("The board has five active columns.")).toBeVisible();
+});
+
+test("refreshes the board when the AI updates it", async ({ page }) => {
+  await signIn(page);
+  await page.route("**/api/ai/chat", async (route) => {
+    const createResponse = await page.request.post("http://127.0.0.1:8010/api/cards", {
+      data: {
+        columnId: "col-backlog",
+        title: "AI e2e card",
+        details: "Created from mocked AI chat.",
+      },
+    });
+    const board = await createResponse.json();
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        message: "I added the requested card.",
+        appliedUpdates: [{ type: "create_card", summary: "Created card 'AI e2e card'." }],
+        board,
+      }),
+    });
+  });
+
+  await page.getByLabel("Message").fill("Create an AI e2e card");
+  await page.getByRole("button", { name: /send to ai/i }).click();
+
+  await expect(page.getByText("I added the requested card.")).toBeVisible();
+  await expect(page.getByText("Created card 'AI e2e card'.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "AI e2e card" })).toBeVisible();
+});

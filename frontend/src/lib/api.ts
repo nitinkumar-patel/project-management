@@ -2,10 +2,26 @@ import type { BoardData } from "@/lib/kanban";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
 
-const requestBoard = async (
+export type ChatMessage = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+export type AppliedAiUpdate = {
+  type: string;
+  summary: string;
+};
+
+export type AiChatResponse = {
+  message: string;
+  appliedUpdates: AppliedAiUpdate[];
+  board: BoardData;
+};
+
+const requestJson = async <T>(
   path: string,
   options: RequestInit = {}
-): Promise<BoardData> => {
+): Promise<T> => {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
     headers: {
@@ -20,6 +36,9 @@ const requestBoard = async (
 
   return response.json();
 };
+
+const requestBoard = (path: string, options: RequestInit = {}) =>
+  requestJson<BoardData>(path, options);
 
 export const fetchBoard = () => requestBoard("/api/board");
 
@@ -50,4 +69,10 @@ export const moveCard = (cardId: string, columnId: string, position: number) =>
 export const deleteCard = (cardId: string) =>
   requestBoard(`/api/cards/${cardId}`, {
     method: "DELETE",
+  });
+
+export const sendAiChat = (question: string, history: ChatMessage[]) =>
+  requestJson<AiChatResponse>("/api/ai/chat", {
+    method: "POST",
+    body: JSON.stringify({ question, history }),
   });
