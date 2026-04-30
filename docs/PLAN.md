@@ -219,20 +219,20 @@ Approval gate:
 Goal: send the board, user question, and conversation history to the AI and receive structured output that can optionally update the board.
 
 Checklist:
-- [ ] Define the structured AI response schema for chat text and optional Kanban updates.
-- [ ] Include the current board JSON, user question, and conversation history in the AI request.
-- [ ] Support AI operations for creating, editing, and moving cards.
-- [ ] Validate AI-proposed board updates before applying them.
-- [ ] Persist valid AI updates to SQLite.
-- [ ] Return both the assistant message and any applied board update summary.
-- [ ] Keep conversation history scoped to the current local session unless persistence is explicitly added later.
+- [x] Define the structured AI response schema for chat text and optional Kanban updates.
+- [x] Include the current board JSON, user question, and conversation history in the AI request.
+- [x] Support AI operations for creating, editing, and moving cards.
+- [x] Validate AI-proposed board updates before applying them.
+- [x] Persist valid AI updates to SQLite.
+- [x] Return both the assistant message and any applied board update summary.
+- [x] Keep conversation history scoped to the current local session unless persistence is explicitly added later.
 
 Tests:
-- [ ] Unit tests for structured response parsing.
-- [ ] Unit tests for validating and applying AI board updates.
-- [ ] API tests with mocked AI responses for no-op answers.
-- [ ] API tests with mocked AI responses for create, edit, and move card operations.
-- [ ] Regression tests ensuring invalid AI updates are rejected safely.
+- [x] Unit tests for structured response parsing.
+- [x] Unit tests for validating and applying AI board updates.
+- [x] API tests with mocked AI responses for no-op answers.
+- [x] API tests with mocked AI responses for create, edit, and move card operations.
+- [x] Regression tests ensuring invalid AI updates are rejected safely.
 
 Success criteria:
 - The AI endpoint returns a user-facing answer.

@@ -9,8 +9,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from openai import OpenAIError
 from project_management_backend import ai
+from project_management_backend import board_ai
 from project_management_backend import database
 from project_management_backend.schemas import (
+    AiChatRequest,
+    AiChatResponse,
     AiConnectivityResponse,
     BoardResponse,
     CreateCardRequest,
@@ -56,6 +59,18 @@ def check_ai_connectivity() -> dict[str, str]:
         "prompt": ai.CONNECTIVITY_PROMPT,
         "answer": answer,
     }
+
+
+@app.post("/api/ai/chat", response_model=AiChatResponse)
+def chat_with_ai(request: Annotated[AiChatRequest, Body()]) -> dict:
+    try:
+        return board_ai.handle_chat(request.question, request.history)
+    except ai.MissingApiKeyError as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+    except board_ai.InvalidAiOperationError as error:
+        raise HTTPException(status_code=502, detail=str(error)) from error
+    except OpenAIError as error:
+        raise HTTPException(status_code=502, detail="OpenAI request failed.") from error
 
 
 @app.get("/api/board", response_model=BoardResponse)

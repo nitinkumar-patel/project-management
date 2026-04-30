@@ -2,6 +2,7 @@ from fastapi.testclient import TestClient
 import pytest
 
 from project_management_backend import ai
+from project_management_backend.schemas import AiBoardOperation, AiStructuredOutput
 import project_management_backend.main as backend_main
 from project_management_backend.main import app
 
@@ -46,6 +47,157 @@ def test_ai_connectivity_reports_missing_api_key(client, monkeypatch) -> None:
 
     assert response.status_code == 503
     assert response.json()["detail"] == "OPENAI_API_KEY is not configured."
+
+
+def test_parse_structured_ai_response() -> None:
+    parsed = ai.parse_structured_output(
+        """
+        {
+          "message": "I created the card.",
+          "operations": [
+            {
+              "type": "create_card",
+              "cardId": null,
+              "columnId": "col-backlog",
+              "title": "New task",
+              "details": "Task details",
+              "position": null
+            }
+          ]
+        }
+        """
+    )
+
+    assert parsed.message == "I created the card."
+    assert parsed.operations[0].type == "create_card"
+    assert parsed.operations[0].columnId == "col-backlog"
+
+
+def test_ai_chat_returns_no_op_answer(client, monkeypatch) -> None:
+    monkeypatch.setattr(
+        ai,
+        "chat_about_board",
+        lambda **kwargs: AiStructuredOutput(message="The board looks good.", operations=[]),
+    )
+
+    response = client.post(
+        "/api/ai/chat",
+        json={
+            "question": "What should I work on?",
+            "history": [{"role": "user", "content": "Hi"}],
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["message"] == "The board looks good."
+    assert body["appliedUpdates"] == []
+    assert body["board"]["columns"][0]["cardIds"] == ["card-1", "card-2"]
+
+
+def test_ai_chat_creates_card(client, monkeypatch) -> None:
+    monkeypatch.setattr(
+        ai,
+        "chat_about_board",
+        lambda **kwargs: AiStructuredOutput(
+            message="I added a planning card.",
+            operations=[
+                AiBoardOperation(
+                    type="create_card",
+                    columnId="col-backlog",
+                    title="Plan launch",
+                    details="Draft launch checklist.",
+                )
+            ],
+        ),
+    )
+
+    response = client.post("/api/ai/chat", json={"question": "Add launch planning."})
+
+    assert response.status_code == 200
+    body = response.json()
+    new_card_id = body["board"]["columns"][0]["cardIds"][-1]
+    assert body["appliedUpdates"] == [
+        {"type": "create_card", "summary": "Created card 'Plan launch'."}
+    ]
+    assert body["board"]["cards"][new_card_id]["title"] == "Plan launch"
+    assert client.get("/api/board").json()["cards"][new_card_id]["title"] == "Plan launch"
+
+
+def test_ai_chat_edits_card(client, monkeypatch) -> None:
+    monkeypatch.setattr(
+        ai,
+        "chat_about_board",
+        lambda **kwargs: AiStructuredOutput(
+            message="I clarified the first card.",
+            operations=[
+                AiBoardOperation(
+                    type="edit_card",
+                    cardId="card-1",
+                    title="Align roadmap and metrics",
+                    details="Draft themes with measurable outcomes.",
+                )
+            ],
+        ),
+    )
+
+    response = client.post("/api/ai/chat", json={"question": "Clarify card 1."})
+
+    assert response.status_code == 200
+    card = response.json()["board"]["cards"]["card-1"]
+    assert card["title"] == "Align roadmap and metrics"
+    assert card["details"] == "Draft themes with measurable outcomes."
+
+
+def test_ai_chat_moves_card(client, monkeypatch) -> None:
+    monkeypatch.setattr(
+        ai,
+        "chat_about_board",
+        lambda **kwargs: AiStructuredOutput(
+            message="I moved the roadmap card to review.",
+            operations=[
+                AiBoardOperation(
+                    type="move_card",
+                    cardId="card-1",
+                    columnId="col-review",
+                    position=0,
+                )
+            ],
+        ),
+    )
+
+    response = client.post("/api/ai/chat", json={"question": "Move card 1 to review."})
+
+    assert response.status_code == 200
+    body = response.json()["board"]
+    backlog = next(column for column in body["columns"] if column["id"] == "col-backlog")
+    review = next(column for column in body["columns"] if column["id"] == "col-review")
+    assert backlog["cardIds"] == ["card-2"]
+    assert review["cardIds"] == ["card-1", "card-6"]
+
+
+def test_ai_chat_rejects_invalid_operation_without_changing_board(client, monkeypatch) -> None:
+    before = client.get("/api/board").json()
+    monkeypatch.setattr(
+        ai,
+        "chat_about_board",
+        lambda **kwargs: AiStructuredOutput(
+            message="I tried to move a card.",
+            operations=[
+                AiBoardOperation(
+                    type="move_card",
+                    cardId="missing-card",
+                    columnId="col-review",
+                    position=0,
+                )
+            ],
+        ),
+    )
+
+    response = client.post("/api/ai/chat", json={"question": "Move a missing card."})
+
+    assert response.status_code == 502
+    assert client.get("/api/board").json() == before
 
 
 def test_index_serves_frontend_entrypoint(client, tmp_path, monkeypatch) -> None:
