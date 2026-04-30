@@ -23,18 +23,18 @@ class BoardResponse(BaseModel):
 
 
 class RenameColumnRequest(BaseModel):
-    title: str = Field(min_length=1)
+    title: str = Field(min_length=1, max_length=500)
 
 
 class CreateCardRequest(BaseModel):
-    columnId: str = Field(min_length=1)
-    title: str = Field(min_length=1)
-    details: str = ""
+    columnId: str = Field(min_length=1, max_length=100)
+    title: str = Field(min_length=1, max_length=500)
+    details: str = Field(default="", max_length=10000)
 
 
 class UpdateCardRequest(BaseModel):
-    title: str = Field(min_length=1)
-    details: str = ""
+    title: str = Field(min_length=1, max_length=500)
+    details: str = Field(default="", max_length=10000)
 
 
 class MoveCardRequest(BaseModel):
@@ -50,11 +50,11 @@ class AiConnectivityResponse(BaseModel):
 
 class AiChatMessage(BaseModel):
     role: Literal["user", "assistant"]
-    content: str = Field(min_length=1)
+    content: str = Field(min_length=1, max_length=10000)
 
 
 class AiChatRequest(BaseModel):
-    question: str = Field(min_length=1)
+    question: str = Field(min_length=1, max_length=10000)
     history: list[AiChatMessage] = []
 
 

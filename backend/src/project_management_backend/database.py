@@ -237,37 +237,14 @@ def rename_column(column_id: str, title: str) -> dict:
 
 
 def create_card(column_id: str, title: str, details: str) -> dict:
-    now = utc_now()
-    card_id = f"card-{uuid4().hex[:12]}"
     with connect() as connection:
-        ensure_column_exists(connection, column_id)
-        next_order = next_card_order(connection, column_id)
-        connection.execute(
-            """
-            INSERT INTO cards
-                (id, board_id, column_id, title, details, sort_order, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            (card_id, DEFAULT_BOARD_ID, column_id, title, details, next_order, now, now),
-        )
-
+        _create_card(connection, column_id, title, details)
     return get_board()
 
 
 def update_card(card_id: str, title: str, details: str) -> dict:
-    now = utc_now()
     with connect() as connection:
-        cursor = connection.execute(
-            """
-            UPDATE cards
-            SET title = ?, details = ?, updated_at = ?
-            WHERE id = ? AND board_id = ?
-            """,
-            (title, details, now, card_id, DEFAULT_BOARD_ID),
-        )
-        if cursor.rowcount == 0:
-            raise NotFoundError("Card not found.")
-
+        _update_card(connection, card_id, title, details)
     return get_board()
 
 
@@ -276,60 +253,12 @@ def delete_card(card_id: str) -> dict:
         card = get_card_row(connection, card_id)
         connection.execute("DELETE FROM cards WHERE id = ?", (card_id,))
         normalize_column_order(connection, card["column_id"])
-
     return get_board()
 
 
 def move_card(card_id: str, column_id: str, position: int) -> dict:
     with connect() as connection:
-        card = get_card_row(connection, card_id)
-        ensure_column_exists(connection, column_id)
-
-        source_column_id = card["column_id"]
-        connection.execute("DELETE FROM cards WHERE id = ?", (card_id,))
-        normalize_column_order(connection, source_column_id)
-
-        target_cards = connection.execute(
-            """
-            SELECT id
-            FROM cards
-            WHERE column_id = ?
-            ORDER BY sort_order
-            """,
-            (column_id,),
-        ).fetchall()
-        target_ids = [row["id"] for row in target_cards]
-        insert_at = min(position, len(target_ids))
-        target_ids.insert(insert_at, card_id)
-
-        now = utc_now()
-        connection.execute(
-            """
-            INSERT INTO cards
-                (id, board_id, column_id, title, details, sort_order, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                card["id"],
-                card["board_id"],
-                column_id,
-                card["title"],
-                card["details"],
-                insert_at,
-                card["created_at"],
-                now,
-            ),
-        )
-        for sort_order, target_card_id in enumerate(target_ids):
-            connection.execute(
-                """
-                UPDATE cards
-                SET sort_order = ?, updated_at = ?
-                WHERE id = ?
-                """,
-                (sort_order, now, target_card_id),
-            )
-
+        _move_card(connection, card_id, column_id, position)
     return get_board()
 
 
@@ -370,4 +299,84 @@ def normalize_column_order(connection: sqlite3.Connection, column_id: str) -> No
         connection.execute(
             "UPDATE cards SET sort_order = ?, updated_at = ? WHERE id = ?",
             (sort_order, now, row["id"]),
+        )
+
+
+def _create_card(connection: sqlite3.Connection, column_id: str, title: str, details: str) -> str:
+    now = utc_now()
+    card_id = f"card-{uuid4().hex[:12]}"
+    ensure_column_exists(connection, column_id)
+    next_order = next_card_order(connection, column_id)
+    connection.execute(
+        """
+        INSERT INTO cards
+            (id, board_id, column_id, title, details, sort_order, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (card_id, DEFAULT_BOARD_ID, column_id, title, details, next_order, now, now),
+    )
+    return card_id
+
+
+def _update_card(connection: sqlite3.Connection, card_id: str, title: str, details: str) -> None:
+    now = utc_now()
+    cursor = connection.execute(
+        """
+        UPDATE cards
+        SET title = ?, details = ?, updated_at = ?
+        WHERE id = ? AND board_id = ?
+        """,
+        (title, details, now, card_id, DEFAULT_BOARD_ID),
+    )
+    if cursor.rowcount == 0:
+        raise NotFoundError("Card not found.")
+
+
+def _move_card(connection: sqlite3.Connection, card_id: str, column_id: str, position: int) -> None:
+    card = get_card_row(connection, card_id)
+    ensure_column_exists(connection, column_id)
+
+    source_column_id = card["column_id"]
+    connection.execute("DELETE FROM cards WHERE id = ?", (card_id,))
+    normalize_column_order(connection, source_column_id)
+
+    target_cards = connection.execute(
+        """
+        SELECT id
+        FROM cards
+        WHERE column_id = ?
+        ORDER BY sort_order
+        """,
+        (column_id,),
+    ).fetchall()
+    target_ids = [row["id"] for row in target_cards]
+    insert_at = min(position, len(target_ids))
+    target_ids.insert(insert_at, card_id)
+
+    now = utc_now()
+    connection.execute(
+        """
+        INSERT INTO cards
+            (id, board_id, column_id, title, details, sort_order, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            card["id"],
+            card["board_id"],
+            column_id,
+            card["title"],
+            card["details"],
+            insert_at,
+            card["created_at"],
+            now,
+        ),
+    )
+    for sort_order, target_card_id in enumerate(target_ids):
+        connection.execute(
+            """
+            UPDATE cards
+            SET sort_order = ?, updated_at = ?
+            WHERE id = ?
+            """,
+            (sort_order, now, target_card_id),
         )

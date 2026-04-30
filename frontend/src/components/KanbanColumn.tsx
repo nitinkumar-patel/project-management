@@ -58,6 +58,7 @@ export const KanbanColumn = ({
             </span>
           </div>
           <input
+            key={column.title}
             defaultValue={column.title}
             onBlur={commitTitle}
             onKeyDown={handleTitleKeyDown}

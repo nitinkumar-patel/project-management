@@ -25,6 +25,11 @@ RUN uv sync --frozen --no-dev
 COPY backend/src ./src
 COPY --from=frontend-builder /app/frontend/out /app/frontend-out
 
+RUN adduser --disabled-password --gecos "" appuser && \
+    mkdir -p /app/backend/data && \
+    chown -R appuser /app
+USER appuser
+
 EXPOSE 8000
 
 CMD ["uv", "run", "--frozen", "--no-dev", "uvicorn", "project_management_backend.main:app", "--host", "0.0.0.0", "--port", "8000"]

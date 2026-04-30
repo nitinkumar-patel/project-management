@@ -18,7 +18,10 @@ def handle_chat(question: str, history: list[AiChatMessage]) -> dict:
         question=question,
         history=[message.model_dump() for message in history],
     )
-    applied_updates = apply_operations(structured_output.operations, board)
+    try:
+        applied_updates = apply_operations(structured_output.operations, board)
+    except database.NotFoundError as e:
+        raise InvalidAiOperationError(str(e)) from e
     return {
         "message": structured_output.message,
         "appliedUpdates": [update.model_dump() for update in applied_updates],
@@ -33,43 +36,56 @@ def apply_operations(
     validate_operations(operations, board)
 
     applied_updates: list[AppliedAiUpdate] = []
-    for operation in operations:
-        if operation.type == "create_card":
-            database.create_card(
-                operation.columnId or "",
-                operation.title or "",
-                operation.details or "",
-            )
-            applied_updates.append(
-                AppliedAiUpdate(
-                    type=operation.type,
-                    summary=f"Created card '{operation.title}'.",
+    # Track card IDs including ones created mid-batch so chained operations can
+    # reference newly created cards by their server-assigned ID.
+    card_ids = set(board["cards"].keys())
+
+    with database.connect() as conn:
+        for operation in operations:
+            if operation.type == "create_card":
+                new_id = database._create_card(
+                    conn,
+                    operation.columnId or "",
+                    operation.title or "",
+                    operation.details or "",
                 )
-            )
-        elif operation.type == "edit_card":
-            database.update_card(
-                operation.cardId or "",
-                operation.title or "",
-                operation.details or "",
-            )
-            applied_updates.append(
-                AppliedAiUpdate(
-                    type=operation.type,
-                    summary=f"Edited card '{operation.cardId}'.",
+                card_ids.add(new_id)
+                applied_updates.append(
+                    AppliedAiUpdate(
+                        type=operation.type,
+                        summary=f"Created card '{operation.title}'.",
+                    )
                 )
-            )
-        elif operation.type == "move_card":
-            database.move_card(
-                operation.cardId or "",
-                operation.columnId or "",
-                operation.position or 0,
-            )
-            applied_updates.append(
-                AppliedAiUpdate(
-                    type=operation.type,
-                    summary=f"Moved card '{operation.cardId}'.",
+            elif operation.type == "edit_card":
+                if (operation.cardId or "") not in card_ids:
+                    raise InvalidAiOperationError("AI requested an invalid card.")
+                database._update_card(
+                    conn,
+                    operation.cardId or "",
+                    operation.title or "",
+                    operation.details or "",
                 )
-            )
+                applied_updates.append(
+                    AppliedAiUpdate(
+                        type=operation.type,
+                        summary=f"Edited card '{operation.cardId}'.",
+                    )
+                )
+            elif operation.type == "move_card":
+                if (operation.cardId or "") not in card_ids:
+                    raise InvalidAiOperationError("AI requested an invalid card.")
+                database._move_card(
+                    conn,
+                    operation.cardId or "",
+                    operation.columnId or "",
+                    operation.position or 0,
+                )
+                applied_updates.append(
+                    AppliedAiUpdate(
+                        type=operation.type,
+                        summary=f"Moved card '{operation.cardId}'.",
+                    )
+                )
 
     return applied_updates
 

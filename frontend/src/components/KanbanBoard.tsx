@@ -14,7 +14,7 @@ import {
 import { AiChatSidebar } from "@/components/AiChatSidebar";
 import { KanbanColumn } from "@/components/KanbanColumn";
 import { KanbanCardPreview } from "@/components/KanbanCardPreview";
-import type { BoardData, Column } from "@/lib/kanban";
+import { moveCard, type BoardData, type Column } from "@/lib/kanban";
 import * as api from "@/lib/api";
 
 type KanbanBoardProps = {
@@ -90,9 +90,19 @@ export const KanbanBoard = ({ onLogout }: KanbanBoardProps) => {
       return;
     }
 
-    applyBoardUpdate(() =>
-      api.moveCard(active.id as string, target.columnId, target.position)
-    );
+    const prevBoard = board;
+    const optimisticColumns = moveCard(board.columns, active.id as string, over.id as string);
+    setBoard({ ...board, columns: optimisticColumns });
+
+    api.moveCard(active.id as string, target.columnId, target.position)
+      .then((nextBoard) => {
+        setBoard(nextBoard);
+        setError("");
+      })
+      .catch(() => {
+        setBoard(prevBoard);
+        setError("Unable to save the board change. Please try again.");
+      });
   };
 
   const handleRenameColumn = (columnId: string, title: string) => {
@@ -100,9 +110,7 @@ export const KanbanBoard = ({ onLogout }: KanbanBoardProps) => {
   };
 
   const handleAddCard = (columnId: string, title: string, details: string) => {
-    applyBoardUpdate(() =>
-      api.createCard(columnId, title, details || "No details yet.")
-    );
+    applyBoardUpdate(() => api.createCard(columnId, title, details));
   };
 
   const handleDeleteCard = (_columnId: string, cardId: string) => {
@@ -254,9 +262,10 @@ const getMoveTarget = (
     };
   }
 
-  const position = targetColumn.cardIds
-    .filter((cardId) => cardId !== activeId)
-    .indexOf(overId);
+  // Use the card's index in the unfiltered list so same-column forward moves
+  // resolve correctly (filtering out activeId shifts overId's index when
+  // activeId precedes overId, causing an off-by-one on the server).
+  const position = targetColumn.cardIds.indexOf(overId);
 
   return {
     columnId: targetColumn.id,

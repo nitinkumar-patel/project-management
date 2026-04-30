@@ -329,6 +329,27 @@ def test_delete_card_removes_it_from_board(client) -> None:
     assert "card-1" not in body["cards"]
 
 
+def test_delete_card_normalizes_sort_order(client) -> None:
+    # Backlog starts with [card-1, card-2]. Delete card-1 (index 0).
+    client.delete("/api/cards/card-1")
+
+    board = client.get("/api/board").json()
+    backlog = next(col for col in board["columns"] if col["id"] == "col-backlog")
+    # card-2 must now be at index 0 with no gaps
+    assert backlog["cardIds"] == ["card-2"]
+
+    # Add a card, then delete the first one again to confirm contiguous ordering
+    client.post("/api/cards", json={"columnId": "col-backlog", "title": "Extra", "details": ""})
+    board = client.get("/api/board").json()
+    backlog = next(col for col in board["columns"] if col["id"] == "col-backlog")
+    first_id, second_id = backlog["cardIds"]
+
+    client.delete(f"/api/cards/{first_id}")
+    board = client.get("/api/board").json()
+    backlog = next(col for col in board["columns"] if col["id"] == "col-backlog")
+    assert backlog["cardIds"] == [second_id]
+
+
 @pytest.mark.parametrize(
     ("method", "path", "json"),
     [

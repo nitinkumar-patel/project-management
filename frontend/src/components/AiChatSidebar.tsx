@@ -10,6 +10,7 @@ type AiChatSidebarProps = {
 };
 
 type DisplayMessage = ChatMessage & {
+  id: string;
   updates?: string[];
 };
 
@@ -20,6 +21,7 @@ export const AiChatSidebar = ({
 }: AiChatSidebarProps) => {
   const [messages, setMessages] = useState<DisplayMessage[]>([
     {
+      id: "initial",
       role: "assistant",
       content:
         "Ask me about the board, or ask me to create, edit, or move cards.",
@@ -36,8 +38,8 @@ export const AiChatSidebar = ({
       return;
     }
 
-    const history = messages.map(({ role, content }) => ({ role, content }));
-    const userMessage: DisplayMessage = { role: "user", content: question };
+    const history = messages.slice(-20).map(({ role, content }) => ({ role, content }));
+    const userMessage: DisplayMessage = { id: crypto.randomUUID(), role: "user", content: question };
     setMessages((current) => [...current, userMessage]);
     setInput("");
     setError("");
@@ -48,6 +50,7 @@ export const AiChatSidebar = ({
       setMessages((current) => [
         ...current,
         {
+          id: crypto.randomUUID(),
           role: "assistant",
           content: response.message,
           updates: response.appliedUpdates.map((update) => update.summary),
@@ -111,9 +114,9 @@ export const AiChatSidebar = ({
         className="mt-5 flex flex-1 flex-col gap-3 overflow-y-auto pr-1"
         aria-live="polite"
       >
-        {messages.map((message, index) => (
+        {messages.map((message) => (
           <div
-            key={`${message.role}-${index}`}
+            key={message.id}
             className={
               message.role === "user"
                 ? "ml-8 rounded-2xl bg-[var(--primary-blue)] px-4 py-3 text-sm leading-6"
