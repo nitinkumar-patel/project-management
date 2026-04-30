@@ -84,19 +84,19 @@ Approval gate:
 Goal: require a local-only sign in before showing the Kanban board.
 
 Checklist:
-- [ ] Add a login screen at `/` when no session is active.
-- [ ] Accept only username `user` and password `password`.
-- [ ] Store the local session in the simplest appropriate browser-side state for the MVP.
-- [ ] Show the Kanban board after successful login.
-- [ ] Add a logout control that returns the user to the login screen.
-- [ ] Show a clear error for invalid credentials.
-- [ ] Avoid adding real authentication infrastructure in this MVP phase.
+- [x] Add a login screen at `/` when no session is active.
+- [x] Accept only username `user` and password `password`.
+- [x] Store the local session in the simplest appropriate browser-side state for the MVP.
+- [x] Show the Kanban board after successful login.
+- [x] Add a logout control that returns the user to the login screen.
+- [x] Show a clear error for invalid credentials.
+- [x] Avoid adding real authentication infrastructure in this MVP phase.
 
 Tests:
-- [ ] Unit tests for login form validation and successful login behavior.
-- [ ] Unit tests for logout behavior.
-- [ ] End-to-end test for invalid login.
-- [ ] End-to-end test for successful login, board visibility, and logout.
+- [x] Unit tests for login form validation and successful login behavior.
+- [x] Unit tests for logout behavior.
+- [x] End-to-end test for invalid login.
+- [x] End-to-end test for successful login, board visibility, and logout.
 
 Success criteria:
 - Unauthenticated users cannot see the board.

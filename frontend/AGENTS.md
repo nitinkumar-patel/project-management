@@ -7,6 +7,8 @@ This directory contains the current frontend-only Kanban demo. It is a Next.js A
 - `src/app/page.tsx` renders the Kanban board at `/`.
 - `src/app/layout.tsx` defines app metadata, Google fonts, and the root layout.
 - `src/app/globals.css` defines Tailwind setup, project color variables, and global typography.
+- `src/components/ProjectApp.tsx` owns the local MVP sign-in gate and session state.
+- `src/components/LoginForm.tsx` renders the hardcoded local sign-in form.
 - `src/components/KanbanBoard.tsx` owns the current in-memory board state and drag/drop handlers.
 - `src/components/KanbanColumn.tsx` renders a droppable column, editable column title, cards, and the add-card form.
 - `src/components/KanbanCard.tsx` renders an individual draggable card and remove action.
@@ -21,7 +23,8 @@ This directory contains the current frontend-only Kanban demo. It is a Next.js A
 - The board is entirely client-side and resets on page refresh.
 - There are five fixed columns in the seed data, but their titles can be renamed in the UI.
 - Cards can be added, removed, reordered, and moved between columns.
-- No login, backend API, persistence, or AI chat is currently wired into the frontend.
+- The app requires the hardcoded MVP credentials `user` and `password` before showing the board.
+- No backend API, persistence, or AI chat is currently wired into the frontend.
 
 ## Commands
 
@@ -47,4 +50,5 @@ Run commands from this `frontend/` directory.
 - Keep board data shapes aligned with `src/lib/kanban.ts` until the backend schema replaces them.
 - Preserve the project color variables from `src/app/globals.css`.
 - Do not expose server-only secrets, including `OPENAI_API_KEY`, to frontend code.
+- Keep the hardcoded sign-in local-only until the backend/API phases replace it.
 - Keep implementation simple for the MVP; avoid adding global state libraries unless the app outgrows local state and straightforward API calls.
