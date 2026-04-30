@@ -137,21 +137,21 @@ Approval gate:
 Goal: add SQLite persistence and API routes for reading and changing a user's Kanban board.
 
 Checklist:
-- [ ] Add SQLite database initialization that creates the database if it does not exist.
-- [ ] Add seed data for the hardcoded MVP user and one default board.
-- [ ] Implement API routes to read the board for the current MVP user.
-- [ ] Implement API routes to rename columns.
-- [ ] Implement API routes to create, update, move, and delete cards.
-- [ ] Keep request and response models explicit with Pydantic.
-- [ ] Return useful HTTP errors for invalid board, column, or card operations.
-- [ ] Keep the implementation simple and local-first.
+- [x] Add SQLite database initialization that creates the database if it does not exist.
+- [x] Add seed data for the hardcoded MVP user and one default board.
+- [x] Implement API routes to read the board for the current MVP user.
+- [x] Implement API routes to rename columns.
+- [x] Implement API routes to create, update, move, and delete cards.
+- [x] Keep request and response models explicit with Pydantic.
+- [x] Return useful HTTP errors for invalid board, column, or card operations.
+- [x] Keep the implementation simple and local-first.
 
 Tests:
-- [ ] Unit tests for database initialization and seed behavior.
-- [ ] API tests for reading the default board.
-- [ ] API tests for column rename.
-- [ ] API tests for card create, update, move, and delete.
-- [ ] API tests for invalid IDs and malformed requests.
+- [x] Unit tests for database initialization and seed behavior.
+- [x] API tests for reading the default board.
+- [x] API tests for column rename.
+- [x] API tests for card create, update, move, and delete.
+- [x] API tests for invalid IDs and malformed requests.
 
 Success criteria:
 - Starting the backend creates a usable SQLite database when none exists.

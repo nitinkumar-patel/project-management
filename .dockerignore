@@ -2,6 +2,7 @@
 .gitignore
 .DS_Store
 .env
+data
 
 backend/.venv
 backend/.pytest_cache
