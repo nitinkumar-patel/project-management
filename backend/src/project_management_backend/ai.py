@@ -10,7 +10,7 @@ BOARD_AI_RESPONSE_SCHEMA = {
     "type": "object",
     "additionalProperties": False,
     "properties": {
-        "message": {"type": "string"},
+        "message": {"type": "string", "minLength": 1},
         "operations": {
             "type": "array",
             "items": {
@@ -105,4 +105,7 @@ def chat_about_board(
 
 
 def parse_structured_output(content: str) -> AiStructuredOutput:
-    return AiStructuredOutput.model_validate_json(content)
+    payload = json.loads(content)
+    if not payload.get("message", "").strip():
+        payload["message"] = "Done."
+    return AiStructuredOutput.model_validate(payload)

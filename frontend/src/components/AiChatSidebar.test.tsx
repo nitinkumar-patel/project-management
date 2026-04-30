@@ -11,7 +11,13 @@ describe("AiChatSidebar", () => {
       board: initialData,
     });
 
-    render(<AiChatSidebar onSend={onSend} />);
+    render(
+      <AiChatSidebar
+        onSend={onSend}
+        isCollapsed={false}
+        onToggle={vi.fn()}
+      />
+    );
 
     await userEvent.type(screen.getByLabelText(/message/i), "Summarize the board");
     await userEvent.click(screen.getByRole("button", { name: /send to ai/i }));
@@ -36,7 +42,13 @@ describe("AiChatSidebar", () => {
       board: initialData,
     });
 
-    render(<AiChatSidebar onSend={onSend} />);
+    render(
+      <AiChatSidebar
+        onSend={onSend}
+        isCollapsed={false}
+        onToggle={vi.fn()}
+      />
+    );
 
     await userEvent.type(screen.getByLabelText(/message/i), "Add a card");
     await userEvent.click(screen.getByRole("button", { name: /send to ai/i }));
@@ -48,7 +60,13 @@ describe("AiChatSidebar", () => {
   it("shows an error when the AI request fails", async () => {
     const onSend = vi.fn().mockRejectedValue(new Error("No AI"));
 
-    render(<AiChatSidebar onSend={onSend} />);
+    render(
+      <AiChatSidebar
+        onSend={onSend}
+        isCollapsed={false}
+        onToggle={vi.fn()}
+      />
+    );
 
     await userEvent.type(screen.getByLabelText(/message/i), "Help");
     await userEvent.click(screen.getByRole("button", { name: /send to ai/i }));
@@ -56,5 +74,22 @@ describe("AiChatSidebar", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "Unable to reach the AI assistant. Please try again."
     );
+  });
+
+  it("renders a collapsed tab that can be expanded", async () => {
+    const onToggle = vi.fn();
+
+    render(
+      <AiChatSidebar
+        onSend={vi.fn()}
+        isCollapsed={true}
+        onToggle={onToggle}
+      />
+    );
+
+    expect(screen.getByText("Board Copilot")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /expand ai assistant/i }));
+
+    expect(onToggle).toHaveBeenCalledOnce();
   });
 });

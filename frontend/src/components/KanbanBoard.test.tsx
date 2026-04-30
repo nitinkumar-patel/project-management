@@ -171,4 +171,38 @@ describe("KanbanBoard", () => {
     expect(await screen.findByText("AI generated card")).toBeInTheDocument();
     expect(screen.getByText("Created card 'AI generated card'.")).toBeInTheDocument();
   });
+
+  it("collapses and expands the AI assistant without losing chat state", async () => {
+    const aiBoard = initialData;
+    vi.mocked(fetch)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => initialData,
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          message: "I can still see the board.",
+          appliedUpdates: [],
+          board: aiBoard,
+        }),
+      } as Response);
+
+    render(<KanbanBoard />);
+    await screen.findAllByTestId(/column-/i);
+
+    await userEvent.type(screen.getByLabelText(/message/i), "Can you help?");
+    await userEvent.click(screen.getByRole("button", { name: /send to ai/i }));
+    expect(await screen.findByText("I can still see the board.")).toBeInTheDocument();
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /collapse ai assistant/i })
+    );
+    expect(screen.queryByText("I can still see the board.")).not.toBeInTheDocument();
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /expand ai assistant/i })
+    );
+    expect(screen.getByText("I can still see the board.")).toBeInTheDocument();
+  });
 });

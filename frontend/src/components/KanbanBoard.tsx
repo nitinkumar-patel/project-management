@@ -25,6 +25,7 @@ export const KanbanBoard = ({ onLogout }: KanbanBoardProps) => {
   const [board, setBoard] = useState<BoardData | null>(null);
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAiCollapsed, setIsAiCollapsed] = useState(false);
   const [error, setError] = useState("");
 
   const sensors = useSensors(
@@ -189,7 +190,13 @@ export const KanbanBoard = ({ onLogout }: KanbanBoardProps) => {
         )}
 
         {board && (
-          <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+          <div
+            className={
+              isAiCollapsed
+                ? "grid gap-6 xl:grid-cols-[minmax(0,1fr)_72px]"
+                : "grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]"
+            }
+          >
             <DndContext
               sensors={sensors}
               collisionDetection={closestCorners}
@@ -216,7 +223,11 @@ export const KanbanBoard = ({ onLogout }: KanbanBoardProps) => {
                 ) : null}
               </DragOverlay>
             </DndContext>
-            <AiChatSidebar onSend={handleSendAiMessage} />
+            <AiChatSidebar
+              onSend={handleSendAiMessage}
+              isCollapsed={isAiCollapsed}
+              onToggle={() => setIsAiCollapsed((current) => !current)}
+            />
           </div>
         )}
       </main>

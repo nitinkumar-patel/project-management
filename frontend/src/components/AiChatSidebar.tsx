@@ -5,13 +5,19 @@ import type { AiChatResponse, ChatMessage } from "@/lib/api";
 
 type AiChatSidebarProps = {
   onSend: (question: string, history: ChatMessage[]) => Promise<AiChatResponse>;
+  isCollapsed: boolean;
+  onToggle: () => void;
 };
 
 type DisplayMessage = ChatMessage & {
   updates?: string[];
 };
 
-export const AiChatSidebar = ({ onSend }: AiChatSidebarProps) => {
+export const AiChatSidebar = ({
+  onSend,
+  isCollapsed,
+  onToggle,
+}: AiChatSidebarProps) => {
   const [messages, setMessages] = useState<DisplayMessage[]>([
     {
       role: "assistant",
@@ -54,13 +60,47 @@ export const AiChatSidebar = ({ onSend }: AiChatSidebarProps) => {
     }
   };
 
+  if (isCollapsed) {
+    return (
+      <aside className="flex min-h-[520px] flex-col items-center rounded-[28px] border border-[var(--stroke)] bg-[var(--navy-dark)] px-3 py-5 text-white shadow-[var(--shadow)]">
+        <button
+          type="button"
+          onClick={onToggle}
+          className="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-white transition hover:border-[var(--accent-yellow)] hover:text-[var(--accent-yellow)]"
+          aria-label="Expand AI assistant"
+        >
+          Open
+        </button>
+        <div className="mt-6 flex flex-1 items-center justify-center">
+          <p className="rotate-180 text-xs font-semibold uppercase tracking-[0.35em] text-white/65 [writing-mode:vertical-rl]">
+            Board Copilot
+          </p>
+        </div>
+      </aside>
+    );
+  }
+
   return (
     <aside className="flex max-h-[760px] min-h-[520px] flex-col rounded-[32px] border border-[var(--stroke)] bg-[var(--navy-dark)] p-5 text-white shadow-[var(--shadow)]">
       <div className="border-b border-white/10 pb-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/55">
-          AI Assistant
-        </p>
-        <h2 className="mt-2 font-display text-2xl font-semibold">Board Copilot</h2>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/55">
+              AI Assistant
+            </p>
+            <h2 className="mt-2 font-display text-2xl font-semibold">
+              Board Copilot
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={onToggle}
+            className="rounded-full border border-white/15 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-white/70 transition hover:border-[var(--accent-yellow)] hover:text-[var(--accent-yellow)]"
+            aria-label="Collapse AI assistant"
+          >
+            Collapse
+          </button>
+        </div>
         <p className="mt-2 text-sm leading-6 text-white/65">
           Ask for a summary, or request card changes. Approved AI updates refresh
           the board automatically.

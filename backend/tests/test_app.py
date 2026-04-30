@@ -73,6 +73,20 @@ def test_parse_structured_ai_response() -> None:
     assert parsed.operations[0].columnId == "col-backlog"
 
 
+def test_parse_structured_ai_response_falls_back_for_empty_message() -> None:
+    parsed = ai.parse_structured_output(
+        """
+        {
+          "message": "",
+          "operations": []
+        }
+        """
+    )
+
+    assert parsed.message == "Done."
+    assert parsed.operations == []
+
+
 def test_ai_chat_returns_no_op_answer(client, monkeypatch) -> None:
     monkeypatch.setattr(
         ai,
