@@ -12,7 +12,7 @@ Current structure:
 Commands:
 - Run backend commands from `backend/`.
 - `uv run pytest` runs backend tests.
-- `uv run uvicorn project_management_backend.main:app --host 0.0.0.0 --port 8000` runs the backend locally.
+- `PYTHONPATH=src uv run uvicorn project_management_backend.main:app --host 0.0.0.0 --port 8000` runs the backend locally.
 
 Conventions:
 - Keep API routes under `/api/`.

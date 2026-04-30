@@ -6,6 +6,7 @@ const signIn = async (page: import("@playwright/test").Page) => {
   await page.getByLabel("Password").fill("password");
   await page.getByRole("button", { name: /sign in/i }).click();
   await expect(page.getByRole("heading", { name: "Kanban Studio" })).toBeVisible();
+  await expect(page.locator('[data-testid^="column-"]')).toHaveCount(5);
 };
 
 test("requires sign in before showing the board", async ({ page }) => {
@@ -40,6 +41,9 @@ test("adds a card to a column", async ({ page }) => {
   await firstColumn.getByPlaceholder("Details").fill("Added via e2e.");
   await firstColumn.getByRole("button", { name: /add card/i }).click();
   await expect(firstColumn.getByText("Playwright card")).toBeVisible();
+
+  await page.reload();
+  await expect(firstColumn.getByText("Playwright card")).toBeVisible();
 });
 
 test("moves a card between columns", async ({ page }) => {
@@ -73,4 +77,17 @@ test("logs out after successful login", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Kanban Studio" })
   ).not.toBeVisible();
+});
+
+test("persists a column rename after reload", async ({ page }) => {
+  await signIn(page);
+  const firstColumn = page.locator('[data-testid^="column-"]').first();
+  const titleInput = firstColumn.getByLabel("Column title");
+
+  await titleInput.fill("Ideas");
+  await titleInput.press("Enter");
+  await expect(titleInput).toHaveValue("Ideas");
+
+  await page.reload();
+  await expect(firstColumn.getByLabel("Column title")).toHaveValue("Ideas");
 });

@@ -166,20 +166,20 @@ Approval gate:
 Goal: make the frontend use the backend API so the Kanban board is persistent.
 
 Checklist:
-- [ ] Replace in-memory initial board state with an API load.
-- [ ] Add simple loading and error states.
-- [ ] Wire column rename to the backend.
-- [ ] Wire card create, update, move, and delete to the backend.
-- [ ] Refresh or update local state after successful API operations.
-- [ ] Keep the UI responsive without adding complex state management.
-- [ ] Ensure the Docker app serves the frontend and API from the same origin.
+- [x] Replace in-memory initial board state with an API load.
+- [x] Add simple loading and error states.
+- [x] Wire column rename to the backend.
+- [x] Wire card create, update, move, and delete to the backend.
+- [x] Refresh or update local state after successful API operations.
+- [x] Keep the UI responsive without adding complex state management.
+- [x] Ensure the Docker app serves the frontend and API from the same origin.
 
 Tests:
-- [ ] Unit tests for API client behavior, if an API client module is introduced.
-- [ ] Component tests for loading, error, and successful board rendering states.
-- [ ] End-to-end test showing a board change persists after reload.
-- [ ] Backend tests from Part 6 still pass.
-- [ ] Docker smoke test for the full app.
+- [x] Unit tests for API client behavior, if an API client module is introduced.
+- [x] Component tests for loading, error, and successful board rendering states.
+- [x] End-to-end test showing a board change persists after reload.
+- [x] Backend tests from Part 6 still pass.
+- [x] Docker smoke test for the full app.
 
 Success criteria:
 - Board changes persist in SQLite.

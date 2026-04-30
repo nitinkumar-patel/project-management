@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import type { FocusEvent, KeyboardEvent } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import type { Card, Column } from "@/lib/kanban";
@@ -22,6 +23,23 @@ export const KanbanColumn = ({
 }: KanbanColumnProps) => {
   const { setNodeRef, isOver } = useDroppable({ id: column.id });
 
+  const commitTitle = (event: FocusEvent<HTMLInputElement>) => {
+    const nextTitle = event.currentTarget.value.trim();
+    if (!nextTitle) {
+      event.currentTarget.value = column.title;
+      return;
+    }
+    if (nextTitle !== column.title) {
+      onRename(column.id, nextTitle);
+    }
+  };
+
+  const handleTitleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      event.currentTarget.blur();
+    }
+  };
+
   return (
     <section
       ref={setNodeRef}
@@ -40,8 +58,9 @@ export const KanbanColumn = ({
             </span>
           </div>
           <input
-            value={column.title}
-            onChange={(event) => onRename(column.id, event.target.value)}
+            defaultValue={column.title}
+            onBlur={commitTitle}
+            onKeyDown={handleTitleKeyDown}
             className="mt-3 w-full bg-transparent font-display text-lg font-semibold text-[var(--navy-dark)] outline-none"
             aria-label="Column title"
           />
