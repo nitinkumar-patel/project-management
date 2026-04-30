@@ -112,17 +112,17 @@ Approval gate:
 Goal: propose and document the SQLite-backed Kanban data model before implementation.
 
 Checklist:
-- [ ] Define the future multi-user schema while supporting one board per signed-in user for the MVP.
-- [ ] Model users, boards, columns, cards, card order, and timestamps.
-- [ ] Decide how fixed-but-renamable columns are represented.
-- [ ] Save the proposed schema as JSON in `docs/`.
-- [ ] Document the database approach in `docs/`, including initialization and migration expectations.
-- [ ] Identify API payload shapes needed by the frontend.
-- [ ] Pause for user review before creating the database implementation.
+- [x] Define the future multi-user schema while supporting one board per signed-in user for the MVP.
+- [x] Model users, boards, columns, cards, card order, and timestamps.
+- [x] Decide how fixed-but-renamable columns are represented.
+- [x] Save the proposed schema as JSON in `docs/`.
+- [x] Document the database approach in `docs/`, including initialization and migration expectations.
+- [x] Identify API payload shapes needed by the frontend.
+- [x] Pause for user review before creating the database implementation.
 
 Tests:
 - Documentation-only phase; no automated tests required.
-- Validate the schema JSON is well-formed.
+- [x] Validate the schema JSON is well-formed.
 
 Success criteria:
 - The schema supports persistence for the current Kanban board.

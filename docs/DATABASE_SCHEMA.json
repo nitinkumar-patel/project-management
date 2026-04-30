@@ -1,0 +1,273 @@
+{
+  "schemaVersion": 1,
+  "database": {
+    "engine": "sqlite",
+    "defaultPath": "data/project-management.sqlite3",
+    "createdIfMissing": true
+  },
+  "tables": [
+    {
+      "name": "users",
+      "purpose": "Stores application users. The MVP seeds one hardcoded user, but the table supports multiple users later.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "constraints": ["PRIMARY KEY"]
+        },
+        {
+          "name": "username",
+          "type": "TEXT",
+          "constraints": ["NOT NULL", "UNIQUE"]
+        },
+        {
+          "name": "display_name",
+          "type": "TEXT",
+          "constraints": ["NOT NULL"]
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "constraints": ["NOT NULL"]
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "constraints": ["NOT NULL"]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "idx_users_username",
+          "columns": ["username"],
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "boards",
+      "purpose": "Stores Kanban boards. The MVP uses one board per user.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "constraints": ["PRIMARY KEY"]
+        },
+        {
+          "name": "user_id",
+          "type": "TEXT",
+          "constraints": ["NOT NULL", "REFERENCES users(id) ON DELETE CASCADE"]
+        },
+        {
+          "name": "title",
+          "type": "TEXT",
+          "constraints": ["NOT NULL"]
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "constraints": ["NOT NULL"]
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "constraints": ["NOT NULL"]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "idx_boards_user_id",
+          "columns": ["user_id"],
+          "unique": false
+        },
+        {
+          "name": "idx_boards_one_per_user",
+          "columns": ["user_id"],
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "board_columns",
+      "purpose": "Stores the fixed columns for a board. Columns are fixed by key and order, while title remains editable.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "constraints": ["PRIMARY KEY"]
+        },
+        {
+          "name": "board_id",
+          "type": "TEXT",
+          "constraints": ["NOT NULL", "REFERENCES boards(id) ON DELETE CASCADE"]
+        },
+        {
+          "name": "column_key",
+          "type": "TEXT",
+          "constraints": ["NOT NULL"]
+        },
+        {
+          "name": "title",
+          "type": "TEXT",
+          "constraints": ["NOT NULL"]
+        },
+        {
+          "name": "sort_order",
+          "type": "INTEGER",
+          "constraints": ["NOT NULL"]
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "constraints": ["NOT NULL"]
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "constraints": ["NOT NULL"]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "idx_board_columns_board_order",
+          "columns": ["board_id", "sort_order"],
+          "unique": false
+        },
+        {
+          "name": "idx_board_columns_board_key",
+          "columns": ["board_id", "column_key"],
+          "unique": true
+        }
+      ],
+      "allowedColumnKeys": [
+        "backlog",
+        "discovery",
+        "in_progress",
+        "review",
+        "done"
+      ]
+    },
+    {
+      "name": "cards",
+      "purpose": "Stores Kanban cards and their position within a column.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "constraints": ["PRIMARY KEY"]
+        },
+        {
+          "name": "board_id",
+          "type": "TEXT",
+          "constraints": ["NOT NULL", "REFERENCES boards(id) ON DELETE CASCADE"]
+        },
+        {
+          "name": "column_id",
+          "type": "TEXT",
+          "constraints": ["NOT NULL", "REFERENCES board_columns(id) ON DELETE CASCADE"]
+        },
+        {
+          "name": "title",
+          "type": "TEXT",
+          "constraints": ["NOT NULL"]
+        },
+        {
+          "name": "details",
+          "type": "TEXT",
+          "constraints": ["NOT NULL", "DEFAULT ''"]
+        },
+        {
+          "name": "sort_order",
+          "type": "INTEGER",
+          "constraints": ["NOT NULL"]
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "constraints": ["NOT NULL"]
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "constraints": ["NOT NULL"]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "idx_cards_board_id",
+          "columns": ["board_id"],
+          "unique": false
+        },
+        {
+          "name": "idx_cards_column_order",
+          "columns": ["column_id", "sort_order"],
+          "unique": false
+        }
+      ]
+    }
+  ],
+  "seedData": {
+    "user": {
+      "id": "user-1",
+      "username": "user",
+      "displayName": "MVP User"
+    },
+    "board": {
+      "id": "board-1",
+      "userId": "user-1",
+      "title": "Kanban Studio"
+    },
+    "columns": [
+      {
+        "id": "col-backlog",
+        "columnKey": "backlog",
+        "title": "Backlog",
+        "sortOrder": 0
+      },
+      {
+        "id": "col-discovery",
+        "columnKey": "discovery",
+        "title": "Discovery",
+        "sortOrder": 1
+      },
+      {
+        "id": "col-progress",
+        "columnKey": "in_progress",
+        "title": "In Progress",
+        "sortOrder": 2
+      },
+      {
+        "id": "col-review",
+        "columnKey": "review",
+        "title": "Review",
+        "sortOrder": 3
+      },
+      {
+        "id": "col-done",
+        "columnKey": "done",
+        "title": "Done",
+        "sortOrder": 4
+      }
+    ]
+  },
+  "apiShape": {
+    "boardResponse": {
+      "id": "board-1",
+      "title": "Kanban Studio",
+      "columns": [
+        {
+          "id": "col-backlog",
+          "title": "Backlog",
+          "cardIds": ["card-1", "card-2"]
+        }
+      ],
+      "cards": {
+        "card-1": {
+          "id": "card-1",
+          "title": "Align roadmap themes",
+          "details": "Draft quarterly themes with impact statements and metrics."
+        }
+      }
+    }
+  }
+}
