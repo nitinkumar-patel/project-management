@@ -1,6 +1,37 @@
 # Project Plan
 
-This plan breaks the MVP into approval-sized parts. Complete one part at a time, check off its tasks as they are finished, run the listed tests, and pause for user approval at each approval gate before moving to the next part.
+This plan tracks the MVP in approval-sized parts. All ten planned parts have been completed and verified.
+
+## Current Status
+
+Status: MVP complete.
+
+Implemented:
+- FastAPI backend packaged with Docker and served at `http://localhost:8000`.
+- Static Next.js frontend served by FastAPI at `/`.
+- Local-only sign in with hardcoded credentials `user` / `password`.
+- SQLite persistence for one seeded MVP user and one Kanban board.
+- Backend APIs for reading the board, renaming columns, and creating, editing, moving, and deleting cards.
+- Frontend wired to the backend API so board changes persist across reloads.
+- OpenAI backend connectivity using `OPENAI_API_KEY` and `gpt-4o-mini`.
+- Board-aware AI backend endpoint with structured outputs for `create_card`, `edit_card`, and `move_card`.
+- AI chat sidebar in the frontend with conversation history, loading/error states, applied update summaries, and automatic board refresh.
+
+Important implementation notes:
+- Runtime database files are stored under `data/` and ignored by git.
+- `OPENAI_API_KEY` stays server-side; frontend code calls backend AI endpoints only.
+- AI-proposed board updates are validated before being applied, and invalid operations are rejected without partially mutating the board.
+- Playwright runs against a real local backend test database and uses mocked AI responses for deterministic UI refresh tests.
+- Project-specific frontend e2e port is `3210`; the test backend uses `8010`.
+
+Latest full verification:
+- `uv run pytest`: 23 backend tests passed.
+- `npm run test:unit`: 19 frontend tests passed.
+- `npm run test:e2e`: 9 browser tests passed.
+- `npm run build`: passed.
+- `npm run lint`: passed.
+- Docker smoke tests passed for `/`, `/api/board`, and `/api/ai/chat`.
+- `ReadLints`: no issues.
 
 ## Part 1: Plan
 
