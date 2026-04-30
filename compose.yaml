@@ -1,0 +1,8 @@
+services:
+  app:
+    build:
+      context: .
+    container_name: project-management-mvp
+    image: project-management-mvp:latest
+    ports:
+      - "8000:8000"

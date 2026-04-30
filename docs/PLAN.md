@@ -29,20 +29,20 @@ Approval gate:
 Goal: add the local Docker/FastAPI foundation and cross-platform start/stop scripts with a minimal working backend.
 
 Checklist:
-- [ ] Create `backend/` with a minimal FastAPI app.
-- [ ] Add a health endpoint, such as `GET /api/health`, returning a small JSON payload.
-- [ ] Serve a simple static HTML page at `/` from FastAPI for the initial scaffold.
-- [ ] Add Python project files using `uv` for dependency management inside the Docker image.
-- [ ] Add Docker infrastructure for running the backend locally.
-- [ ] Add start and stop scripts for Mac, Linux, and Windows in `scripts/`.
-- [ ] Document the local run flow briefly in the root README or docs.
-- [ ] Keep `.env` secrets out of git and ensure generated runtime files are ignored.
+- [x] Create `backend/` with a minimal FastAPI app.
+- [x] Add a health endpoint, such as `GET /api/health`, returning a small JSON payload.
+- [x] Serve a simple static HTML page at `/` from FastAPI for the initial scaffold.
+- [x] Add Python project files using `uv` for dependency management inside the Docker image.
+- [x] Add Docker infrastructure for running the backend locally.
+- [x] Add start and stop scripts for Mac, Linux, and Windows in `scripts/`.
+- [x] Document the local run flow briefly in the root README or docs.
+- [x] Keep `.env` secrets out of git and ensure generated runtime files are ignored.
 
 Tests:
-- [ ] Backend unit test for the health endpoint.
-- [ ] Backend unit or integration test proving `/` serves HTML.
-- [ ] Manual script smoke test: start the app, call `/`, call `/api/health`, then stop the app.
-- [ ] Docker build succeeds from a clean checkout.
+- [x] Backend unit test for the health endpoint.
+- [x] Backend unit or integration test proving `/` serves HTML.
+- [x] Manual script smoke test: start the app, call `/`, call `/api/health`, then stop the app.
+- [x] Docker build succeeds from a clean checkout.
 
 Success criteria:
 - A local user can start and stop the container with the appropriate script.
