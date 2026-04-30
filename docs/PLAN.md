@@ -58,18 +58,18 @@ Approval gate:
 Goal: build the existing Next.js Kanban frontend as static assets and serve it from FastAPI at `/`.
 
 Checklist:
-- [ ] Configure the frontend for static export compatible with FastAPI static serving.
-- [ ] Update the Docker build to install frontend dependencies and build the static site.
-- [ ] Copy the static frontend build into the backend image.
-- [ ] Replace the scaffold HTML at `/` with the built Kanban app.
-- [ ] Preserve the current demo board behavior: render columns, rename columns, add cards, remove cards, and drag cards.
-- [ ] Keep frontend code independent of backend persistence until Part 7.
+- [x] Configure the frontend for static export compatible with FastAPI static serving.
+- [x] Update the Docker build to install frontend dependencies and build the static site.
+- [x] Copy the static frontend build into the backend image.
+- [x] Replace the scaffold HTML at `/` with the built Kanban app.
+- [x] Preserve the current demo board behavior: render columns, rename columns, add cards, remove cards, and drag cards.
+- [x] Keep frontend code independent of backend persistence until Part 7.
 
 Tests:
-- [ ] Frontend unit tests pass with `npm run test:unit`.
-- [ ] Frontend end-to-end tests pass with `npm run test:e2e`.
-- [ ] Backend/static-serving test confirms `/` serves the frontend entry point.
-- [ ] Docker smoke test confirms the Kanban board loads from the container.
+- [x] Frontend unit tests pass with `npm run test:unit`.
+- [x] Frontend end-to-end tests pass with `npm run test:e2e`.
+- [x] Backend/static-serving test confirms `/` serves the frontend entry point.
+- [x] Docker smoke test confirms the Kanban board loads from the container.
 
 Success criteria:
 - The Kanban board is visible at `/` when the Docker app is running.

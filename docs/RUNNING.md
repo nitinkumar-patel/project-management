@@ -1,6 +1,6 @@
 # Running Locally
 
-Part 2 runs a FastAPI scaffold in Docker at `http://localhost:8000`.
+The Docker app runs FastAPI at `http://localhost:8000`. FastAPI serves the built frontend at `/` and the API under `/api/`.
 
 ## Start
 
@@ -21,7 +21,7 @@ Windows PowerShell:
 
 ## Check
 
-- Open `http://localhost:8000` to see the scaffold HTML page.
+- Open `http://localhost:8000` to see the app.
 - Open `http://localhost:8000/api/health` to see the backend health JSON.
 
 ## Stop
