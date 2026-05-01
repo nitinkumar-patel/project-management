@@ -69,10 +69,12 @@ export const AiChatSidebar = ({
         <button
           type="button"
           onClick={onToggle}
-          className="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-white transition hover:border-[var(--accent-yellow)] hover:text-[var(--accent-yellow)]"
+          className="rounded-full border border-white/15 bg-white/10 p-2.5 text-white transition hover:border-[var(--accent-yellow)] hover:text-[var(--accent-yellow)]"
           aria-label="Expand AI assistant"
         >
-          Open
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
         </button>
         <div className="mt-6 flex flex-1 items-center justify-center">
           <p className="rotate-180 text-xs font-semibold uppercase tracking-[0.35em] text-white/65 [writing-mode:vertical-rl]">
@@ -98,10 +100,12 @@ export const AiChatSidebar = ({
           <button
             type="button"
             onClick={onToggle}
-            className="rounded-full border border-white/15 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-white/70 transition hover:border-[var(--accent-yellow)] hover:text-[var(--accent-yellow)]"
+            className="rounded-full border border-white/15 p-2 text-white/70 transition hover:border-[var(--accent-yellow)] hover:text-[var(--accent-yellow)]"
             aria-label="Collapse AI assistant"
           >
-            Collapse
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
           </button>
         </div>
         <p className="mt-2 text-sm leading-6 text-white/65">
